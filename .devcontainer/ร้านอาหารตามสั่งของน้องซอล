@@ -1,0 +1,64 @@
+import streamlit as st
+
+st.title("🍳 ร้านอาหารตามสั่งของน้องซอล")
+
+# รายการสินค้า
+rharn = {
+    "กะเพราหมูสับ": 40,
+    "กะเพราหมูกรอบ": 50,
+    "หมูปิ้งโบราณ": 5,
+    "ซาลาเปาไส้หมู": 25,
+    "ข้าวหมูหวาน": 40,
+    "ข้าวหมูกระเทียม": 40,
+    "ข้าวขาหมู": 45,
+    "ข้าวหมูแดง": 40
+}
+
+st.write("### 🍱 เลือกสินค้า")
+
+total = 0
+order = []
+
+for rharn, raka in rharn.items():
+    quantity = st.number_input(
+        f"{rharn} ราคา {raka} บาท",
+        min_value=0,
+        max_value=20,
+        value=0,
+        step=1
+    )
+
+    if quantity > 0:
+        subtotal = rharn * quantity
+        total += subtotal
+        order.append((rharn, raka, quantity, subtotal))
+
+st.divider()
+
+# แสดงรายการที่เลือก
+if order:
+    st.write("### 🧾 รายการสั่งซื้อ")
+
+    for rharn, raka, quantity, subtotal in order:
+        st.write(
+            f"- {rharn} × {quantity} = {subtotal:,} บาท"
+        )
+
+    st.write(f"**ราคารวมก่อนลด: {total:,} บาท**")
+
+    # -------------------------
+    # เงื่อนไขส่วนลด
+    # -------------------------
+    discount = 0
+
+    # ซื้อครบ 200 บาท ลด 10%
+    if total >= 200:
+        discount = total * 0.10
+
+    final_raka = total - discount
+
+    st.write(f"💸 ส่วนลด: {discount:,.2f} บาท")
+    st.success(f"💰 ยอดที่ต้องจ่ายจริง: {final_raka:,.2f} บาท")
+
+else:
+    st.info("กรุณาเลือกสินค้าอย่างน้อย 1 รายการ")
