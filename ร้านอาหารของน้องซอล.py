@@ -1,100 +1,42 @@
 import streamlit as st
-from datetime import date
 
-st.set_page_config(
-    page_title="ร้านอาหารตามสั่งของน้องชอล",
-    page_icon="🍳",
-    layout="centered"
-)
+st.title("ร้านอาหารตามสั่งของน้องชอล")
 
-# ข้อมูลเมนู
+st.write("เลือกรายการอาหาร")
 
-menu = {
-    "กะเพราหมูสับ": 40,
-    "กะเพราหมูกรอบ": 50,
-    "หมูปิ้งโบราณ": 5,
-    "ซาลาเปาไส้หมู": 25,
-    "ข้าวหมูหวาน": 40,
-    "ข้าวหมูกระเทียม": 40,
-    "ข้าวขาหมู": 45,
-    "ข้าวหมูแดง": 40,
-}
-
-st.title("🍳 ร้านอาหารตามสั่งของน้องชอล")
-st.divider()
-
-# เลือกเมนูและจำนวน
-
-st.subheader("🛒 รายการอาหาร")
-quantities = {}
-for item, price in menu.items():
-    col1, col2, col3 = st.columns([4, 2, 2])
-    with col1:
-        st.write(f"**{item}**")
-        st.caption(f"{price} บาท")
-    with col2:
-        quantities[item] = st.number_input(
-            "จำนวน",
-            min_value=0,
-            max_value=99,
-            value=0,
-            step=1,
-            key=f"qty_{item}"
-        )
-    with col3:
-        subtotal = price * quantities[item]
-        st.write(f"**{subtotal:,} บาท**")
-st.divider()
-
+# จำนวนอาหาร
+กะเพราหมูสับ = st.number_input("กะเพราหมูสับ 40 บาท", 0, 10, 0)
+กะเพราหมูกรอบ = st.number_input("กะเพราหมูกรอบ 50 บาท", 0, 10, 0)
+หมูปิ้ง = st.number_input("หมูปิ้งโบราณ 5 บาท", 0, 10, 0)
+ซาลาเปา = st.number_input("ซาลาเปาไส้หมู 25 บาท", 0, 10, 0)
+ข้าวหมูหวาน = st.number_input("ข้าวหมูหวาน 40 บาท", 0, 10, 0)
+ข้าวหมูกระเทียม = st.number_input("ข้าวหมูกระเทียม 40 บาท", 0, 10, 0)
+ข้าวขาหมู = st.number_input("ข้าวขาหมู 45 บาท", 0, 10, 0)
+ข้าวหมูแดง = st.number_input("ข้าวหมูแดง 40 บาท", 0, 10, 0)
 
 # คำนวณราคา
-
-total = sum(menu[item] * quantities[item] for item in menu)
+ราคา = (
+    กะเพราหมูสับ * 40 +
+    กะเพราหมูกรอบ * 50 +
+    หมูปิ้ง * 5 +
+    ซาลาเปา * 25 +
+    ข้าวหมูหวาน * 40 +
+    ข้าวหมูกระเทียม * 40 +
+    ข้าวขาหมู * 45 +
+    ข้าวหมูแดง * 40
+)
 
 # ส่วนลด
-discount = 0
-discount_text = "ไม่มีส่วนลด"
+ส่วนลด = 0
 
-# วันอังคาร ลด 20% (ใช้สิทธิ์นี้ก่อน)
-if selected_date.weekday() == 1 and total > 0:
-    discount = total * 0.20
-    discount_text = "ส่วนลดวันอังคาร 20%"
-# ซื้อครบ 200 ลด 10%
-elif total >= 200:
-    discount = total * 0.10
-    discount_text = "ซื้อครบ 200 บาท ลด 10%"
-net_total = total - discount
-st.subheader("💰 สรุปยอด")
-col1, col2 = st.columns(2)
-with col1:
-    st.metric("รวมราคา", f"{total:,.2f} บาท")
-with col2:
-    st.metric("ส่วนลด", f"{discount:,.2f} บาท")
-st.info(discount_text)
-st.success(f"### ราคาสุทธิ {net_total:,.2f} บาท")
+if ราคา >= 200:
+    ส่วนลด = ราคา * 10 / 100
 
-# แสดงรายการที่เลือก
+ราคาสุทธิ = ราคา - ส่วนลด
 
-selected_items = [
-    (item, quantities[item], menu[item] * quantities[item])
-    for item in menu
-    if quantities[item] > 0
-]
+st.write("รวมราคา =", ราคา, "บาท")
+st.write("ส่วนลด =", ส่วนลด, "บาท")
+st.write("ราคาสุทธิ =", ราคาสุทธิ, "บาท")
 
-if selected_items:
-    st.subheader("📋 รายการที่สั่ง")
-
-    for item, qty, subtotal in selected_items:
-        st.write(f"- {item} × {qty} = **{subtotal:,} บาท**")
-else:
-    st.warning("ยังไม่ได้เลือกเมนู")
-
-
-# ปุ่มยืนยัน
-
-if st.button("✅ ยืนยันการสั่งซื้อ", use_container_width=True):
-    if total == 0:
-        st.error("กรุณาเลือกอาหารอย่างน้อย 1 รายการ")
-    else:
-        st.balloons()
-        st.success(f"สั่งซื้อสำเร็จ! ยอดชำระ {net_total:,.2f} บาท")
+if st.button("ยืนยันการสั่งซื้อ"):
+    st.success("สั่งซื้อสำเร็จ")
