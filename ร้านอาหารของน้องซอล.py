@@ -9,7 +9,7 @@ st.set_page_config(
 
 # ข้อมูลเมนู
 
-MENU = {
+menu = {
     "กะเพราหมูสับ": 40,
     "กะเพราหมูกรอบ": 50,
     "หมูปิ้งโบราณ": 5,
@@ -21,32 +21,17 @@ MENU = {
 }
 
 st.title("🍳 ร้านอาหารตามสั่งของน้องชอล")
-st.caption("เลือกเมนู ระบุจำนวน แล้วระบบคำนวณส่วนลดและราคาสุทธิให้อัตโนมัติ")
-
 st.divider()
-
-# เลือกวันที่
-
-selected_date = st.date_input(
-    "วันที่สั่งอาหาร",
-    value=date.today(),
-    format="DD/MM/YYYY"
-)
-
 
 # เลือกเมนูและจำนวน
 
 st.subheader("🛒 รายการอาหาร")
-
 quantities = {}
-
-for item, price in MENU.items():
+for item, price in menu.items():
     col1, col2, col3 = st.columns([4, 2, 2])
-
     with col1:
         st.write(f"**{item}**")
         st.caption(f"{price} บาท")
-
     with col2:
         quantities[item] = st.number_input(
             "จำนวน",
@@ -56,17 +41,15 @@ for item, price in MENU.items():
             step=1,
             key=f"qty_{item}"
         )
-
     with col3:
         subtotal = price * quantities[item]
         st.write(f"**{subtotal:,} บาท**")
-
 st.divider()
 
 
 # คำนวณราคา
 
-total = sum(MENU[item] * quantities[item] for item in MENU)
+total = sum(menu[item] * quantities[item] for item in menu)
 
 # ส่วนลด
 discount = 0
@@ -80,29 +63,21 @@ if selected_date.weekday() == 1 and total > 0:
 elif total >= 200:
     discount = total * 0.10
     discount_text = "ซื้อครบ 200 บาท ลด 10%"
-
 net_total = total - discount
-
 st.subheader("💰 สรุปยอด")
-
 col1, col2 = st.columns(2)
-
 with col1:
     st.metric("รวมราคา", f"{total:,.2f} บาท")
-
 with col2:
     st.metric("ส่วนลด", f"{discount:,.2f} บาท")
-
 st.info(discount_text)
-
 st.success(f"### ราคาสุทธิ {net_total:,.2f} บาท")
-
 
 # แสดงรายการที่เลือก
 
 selected_items = [
-    (item, quantities[item], MENU[item] * quantities[item])
-    for item in MENU
+    (item, quantities[item], menu[item] * quantities[item])
+    for item in menu
     if quantities[item] > 0
 ]
 
